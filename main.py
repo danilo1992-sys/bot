@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from componets.start import start, test, saludar
+from componets.comands import start, match, team, group
 from telegram.ext import ApplicationBuilder, CommandHandler
 import logging
 
@@ -18,8 +18,9 @@ if __name__ == "__main__":
 
     # Agregar un manejador para el comando /start
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("test", test))
-    application.add_handler(CommandHandler("saludar", saludar))
+    application.add_handler(CommandHandler("match", match))
+    application.add_handler(CommandHandler("team", team))
+    application.add_handler(CommandHandler("groups", group))
 
     print("Bot iniciado. Presiona Ctrl+C para detenerlo.")
     application.run_polling()
