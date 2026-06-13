@@ -5,6 +5,7 @@ from componets.utils import flag
 MATCH = "https://worldcupfixtureapi.com/api/matches"
 TEAM = "https://worldcupfixtureapi.com/api/teams"
 GROUP = "https://worldcupfixtureapi.com/api/groups"
+TODAY = "https://worldcupfixtureapi.com/api/matches/today"
 
 
 def get_groups(group=None):
@@ -70,6 +71,23 @@ def teams(team=None):
         lines = [f"⚽ Grupo {g}"] + grouped[g]
         result.append((g, "\n".join(lines)))
     return result
+
+
+def today():
+    response = requests.get(TODAY)
+    response.raise_for_status()
+    data = response.json()
+    if data["count"] == 0:
+        return None
+    lines = []
+    for m in data["matches"]:
+        home = m["homeTeam"]["name"]
+        away = m["awayTeam"]["name"]
+        time = m["kickoff"]["local"]["time"]
+        g = m.get("group") or ""
+        date = m["kickoff"]["local"]["date"]
+        lines.append(f"📅 {date} ⏰ {time} | {home} vs {away} (Grupo {g})")
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":

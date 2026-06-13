@@ -1,6 +1,11 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from componets.url import match as get_matches, teams, get_groups
+from componets.url import (
+    match as get_matches,
+    teams,
+    get_groups,
+    today as get_today_matches,
+)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -45,11 +50,22 @@ async def group(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(texto)
 
 
-async def saludar(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if context.args:
-        nombre = " ".join(context.args)
-        await update.message.reply_text(f"¡Hola, {nombre}! Mucho gusto.")
-    else:
-        await update.message.reply_text(
-            "Hola. Si quieres que te salude por tu nombre, escribe /saludar seguido de tu nombre."
-        )
+async def today(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    partidos = get_today_matches()
+    if not partidos:
+        await update.message.reply_text("No hay partidos programados para hoy.")
+        return
+    await update.message.reply_text(partidos)
+
+
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    texto = (
+        "📋 Comandos disponibles:\n\n"
+        "/start - Inicia el bot\n"
+        "/match <grupo> - Partidos de un grupo. Ej: /match A\n"
+        "/team <pais> - Info de un equipo. Ej: /team Uruguay\n"
+        "/groups - Muestra todos los grupos\n"
+        "/today - Partidos del día\n"
+        "/help - Muestra esta ayuda"
+    )
+    await update.message.reply_text(texto)
