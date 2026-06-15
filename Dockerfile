@@ -2,8 +2,8 @@ FROM python:3.14-slim AS base
 
 WORKDIR /app
 
-# Instalar git y uv
-RUN apt-get update && apt-get install -y --no-install-recommends git && \
+# Instalar git, bash y uv
+RUN apt-get update && apt-get install -y --no-install-recommends git bash && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -20,4 +20,4 @@ COPY . .
 
 RUN chmod +x entrypoint.sh
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["bash", "./entrypoint.sh"]
