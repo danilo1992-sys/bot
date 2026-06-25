@@ -1,5 +1,7 @@
 import os
 import threading
+import time
+import urllib.request
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from dotenv import load_dotenv
 from componets.comands import start, match, team, group, today, help
@@ -13,6 +15,8 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
+PORT = int(os.getenv("PORT", "10000"))
+
 
 class HealthHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -25,15 +29,23 @@ class HealthHandler(BaseHTTPRequestHandler):
 
 
 def run_health_server():
-    port = int(os.getenv("PORT", "10000"))
-    server = HTTPServer(("0.0.0.0", port), HealthHandler)
-    logging.info("Servidor de salud iniciado en puerto %d", port)
+    server = HTTPServer(("0.0.0.0", PORT), HealthHandler)
+    logging.info("Servidor de salud iniciado en puerto %d", PORT)
     server.serve_forever()
 
 
+def keepalive():
+    while True:
+        time.sleep(600)
+        try:
+            urllib.request.urlopen(f"http://localhost:{PORT}/", timeout=5)
+        except Exception:
+            pass
+
+
 if __name__ == "__main__":
-    t = threading.Thread(target=run_health_server, daemon=True)
-    t.start()
+    threading.Thread(target=run_health_server, daemon=True).start()
+    threading.Thread(target=keepalive, daemon=True).start()
 
     application = ApplicationBuilder().token(TOKEN).build()
 
